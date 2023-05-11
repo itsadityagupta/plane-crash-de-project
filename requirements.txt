@@ -1,3 +1,7 @@
 pre-commit
 requests
 beautifulsoup4
+pandas
+numpy
+tqdm
+pyarrow
