@@ -2,7 +2,9 @@ import os
 from configparser import ConfigParser
 
 config = ConfigParser()
-config.read("config.ini")
+config.read(
+    os.path.join(os.path.dirname(os.path.abspath(__file__)), "config.ini")
+)
 
 folder_path = config.get("files", "folder_path")
 file_columns = config.get("files", "file_columns").split(",")

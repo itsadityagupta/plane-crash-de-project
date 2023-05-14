@@ -250,6 +250,7 @@ class ProcessData:
 
         for file in tqdm(self.files):
             file_path = os.path.join(self.folder_path, file).replace("\\", "/")
+            print(f"Processing file: {file_path}")
             data = pd.read_json(file_path)
             data.columns = config.file_columns
             self.process_files_util(data)
@@ -264,9 +265,17 @@ class ProcessData:
         os.makedirs(config.output_folder_path, exist_ok=True)
 
         # writes the tables to files
+        print(f"Writing fact_accident table at {config.fact_accident_path}")
         self.fact_accident.to_parquet(config.fact_accident_path)
+        print(f"Writing dim_date table at {config.dim_date_path}")
         self.dim_date.to_parquet(config.dim_date_path)
+        print(f"Writing dim_time table at {config.dim_time_path}")
         self.dim_time.to_parquet(config.dim_time_path)
+        print(f"Writing dim_airline table at {config.dim_airline_path}")
         self.dim_airline.to_parquet(config.dim_airline_path)
+        print(f"Writing dim_route table at {config.dim_route_path}")
         self.dim_route.to_parquet(config.dim_route_path)
+        print(
+            f"Writing dim_aircraft_type table at {config.dim_aircraft_type_path}"
+        )
         self.dim_aircraft_type.to_parquet(config.dim_aircraft_type_path)
