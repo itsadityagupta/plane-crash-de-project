@@ -13,6 +13,8 @@ And here's the data model schema:
 
 ### Progress
 
+05/14/2023 - Create a DAG to fetch and process files from S3
+
 05/11/2023 - Process raw JSON files into fact and dimension tables into separate parquet files.
 
 Uploaded to S3: aws s3 cp . s3://plane-crash-datalake/raw --recursive
