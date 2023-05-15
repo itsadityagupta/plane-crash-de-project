@@ -7,14 +7,14 @@ from airflow.providers.amazon.aws.hooks.s3 import S3Hook
 
 from data_processing.process_data import ProcessData
 
-default_args = {"owner": "airflow", "start_date": datetime(2023, 5, 12)}
+default_args = {"owner": "airflow", "start_date": datetime(2023, 5, 15)}
+s3_hook = S3Hook(aws_conn_id="aws")
 
 
 def download_json_files():
     """
     Downloads JSON files from S3 bucket for further processing.
     """
-    s3_hook = S3Hook(aws_conn_id="aws")
     bucket_name = "plane-crash-datalake"
     prefix = "raw/"
     os.makedirs("tmp", exist_ok=True)
@@ -39,6 +39,26 @@ def process_json_files():
     process_data.process_files()
 
 
+def upload_folder_to_s3():
+    """
+    Upload the processed files to S3.
+    """
+    folder_path = "processed"
+    s3_bucket = "plane-crash-datalake"
+    s3_prefix = "processed"
+
+    for root, dirs, files in os.walk(folder_path):
+        for file in files:
+            file_path = os.path.join(root, file)
+            s3_key = os.path.join(s3_prefix, file)
+            s3_hook.load_file(
+                file_path, key=s3_key, bucket_name=s3_bucket, replace=True
+            )
+            print(
+                f"Uploaded {file_path} to S3 bucket {s3_bucket} with key {s3_key}"
+            )
+
+
 with DAG(
     "download_json_files_from_s3",
     default_args=default_args,
@@ -52,4 +72,8 @@ with DAG(
         task_id="process_json_files", python_callable=process_json_files
     )
 
-    download_task >> process_task
+    upload_processed_files = PythonOperator(
+        task_id="upload_processed_files", python_callable=upload_folder_to_s3
+    )
+
+    download_task >> process_task >> upload_processed_files
